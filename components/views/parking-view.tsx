@@ -6,6 +6,7 @@ interface ParkingLot {
   id: string
   name: string
   location: string
+  facultad: string
   status: OccupancyStatus
   spotsAvailable: number
   totalSpots: number
@@ -16,6 +17,7 @@ const parkingLots: ParkingLot[] = [
     id: "1",
     name: "Estacionamiento Norte",
     location: "Edificio de Ingeniería",
+    facultad: "Facultad de Ingeniería",
     status: "low",
     spotsAvailable: 45,
     totalSpots: 60,
@@ -24,6 +26,7 @@ const parkingLots: ParkingLot[] = [
     id: "2",
     name: "Estacionamiento Central",
     location: "Biblioteca Central",
+    facultad: "Facultad de Humanidades",
     status: "moderate",
     spotsAvailable: 12,
     totalSpots: 40,
@@ -32,6 +35,7 @@ const parkingLots: ParkingLot[] = [
     id: "3",
     name: "Estacionamiento Sur",
     location: "Facultad de Medicina",
+    facultad: "Facultad de Medicina",
     status: "heavy",
     spotsAvailable: 3,
     totalSpots: 50,
@@ -40,6 +44,7 @@ const parkingLots: ParkingLot[] = [
     id: "4",
     name: "Estacionamiento Deportivo",
     location: "Gimnasio Universitario",
+    facultad: "Facultad de Deportes",
     status: "low",
     spotsAvailable: 28,
     totalSpots: 35,
@@ -48,6 +53,7 @@ const parkingLots: ParkingLot[] = [
     id: "5",
     name: "Estacionamiento Docentes",
     location: "Rectoría",
+    facultad: "Ingeniería y Humanidades",
     status: "moderate",
     spotsAvailable: 8,
     totalSpots: 25,
@@ -56,6 +62,7 @@ const parkingLots: ParkingLot[] = [
     id: "6",
     name: "Estacionamiento Visitantes",
     location: "Entrada Principal",
+    facultad: "Facultad de Ciencias",
     status: "heavy",
     spotsAvailable: 2,
     totalSpots: 30,
@@ -100,6 +107,7 @@ export function ParkingView() {
           <ParkingCard
             key={lot.id}
             name={lot.name}
+            facultad={lot.facultad}
             location={lot.location}
             status={lot.status}
             spotsAvailable={lot.spotsAvailable}
