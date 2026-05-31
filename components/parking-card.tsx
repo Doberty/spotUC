@@ -3,8 +3,8 @@
 import { CarIcon, MapPinIcon, GraduationCapIcon } from "@phosphor-icons/react"
 import { Card, CardContent } from "@/components/ui/card"
 import { cn } from "@/lib/utils"
+import { parkingStatusMeta, OccupancyStatus } from "@/utils/getAvailabilityStatus"
 
-export type OccupancyStatus = "low" | "moderate" | "heavy"
 
 interface ParkingCardProps {
   name: string
@@ -15,27 +15,6 @@ interface ParkingCardProps {
   totalSpots: number
 }
 
-const statusConfig = {
-  low: {
-    label: "Disponible",
-    bgColor: "bg-status-low/10",
-    textColor: "text-status-low",
-    dotColor: "bg-status-low",
-  },
-  moderate: {
-    label: "Moderado",
-    bgColor: "bg-status-moderate/10",
-    textColor: "text-status-moderate",
-    dotColor: "bg-status-moderate",
-  },
-  heavy: {
-    label: "Lleno",
-    bgColor: "bg-status-heavy/10",
-    textColor: "text-status-heavy",
-    dotColor: "bg-status-heavy",
-  },
-}
-
 export function ParkingCard({
   name,
   location,
@@ -44,7 +23,7 @@ export function ParkingCard({
   spotsAvailable,
   totalSpots,
 }: ParkingCardProps) {
-  const config = statusConfig[status]
+  const config = parkingStatusMeta[status]
   const occupancyPercentage = ((totalSpots - spotsAvailable) / totalSpots) * 100
 
   return (
@@ -65,7 +44,7 @@ export function ParkingCard({
                 <span className="truncate">{location}</span>
               </div>
 
-              {/* Facultad (NUEVO) */}
+              {/* Facultad */}
               <div className="flex items-center gap-1 text-muted-foreground text-sm mt-0.5">
                 <GraduationCapIcon className="w-3.5 h-3.5 shrink-0" />
                 <span className="truncate">{facultad}</span>
@@ -77,11 +56,11 @@ export function ParkingCard({
             <div
               className={cn(
                 "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
-                config.bgColor,
-                config.textColor
+                config.softBgClass,
+                config.textClass
               )}
             >
-              <span className={cn("w-1.5 h-1.5 rounded-full", config.dotColor)} />
+              <span className={cn("w-1.5 h-1.5 rounded-full", config.bgClass)} />
               {config.label}
             </div>
 
@@ -97,7 +76,7 @@ export function ParkingCard({
             <div
               className={cn(
                 "h-full rounded-full transition-all duration-500",
-                config.dotColor
+                config.bgClass
               )}
               style={{ width: `${occupancyPercentage}%` }}
             />
