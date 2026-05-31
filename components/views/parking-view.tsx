@@ -1,70 +1,32 @@
 "use client"
 
-import { ParkingCard, type OccupancyStatus } from "@/components/parking-card"
+import { ParkingCard } from "@/components/parking-card"
+import { parkingZones } from "@/data/parking-zones"
+import dynamic from "next/dynamic"
+import { useState } from "react"
+import { getAvailabilityStatus, parkingStatusMeta } from "@/utils/getAvailabilityStatus"
 
-interface ParkingLot {
-  id: string
-  name: string
-  location: string
-  status: OccupancyStatus
-  spotsAvailable: number
-  totalSpots: number
-}
-
-const parkingLots: ParkingLot[] = [
+const ParkingLotMap = dynamic(
+  () =>
+    import("@/components/parking-lot-map").then(
+      (mod) => mod.ParkingLotMap
+    ),
   {
-    id: "1",
-    name: "Estacionamiento Norte",
-    location: "Edificio de Ingeniería",
-    status: "low",
-    spotsAvailable: 45,
-    totalSpots: 60,
-  },
-  {
-    id: "2",
-    name: "Estacionamiento Central",
-    location: "Biblioteca Central",
-    status: "moderate",
-    spotsAvailable: 12,
-    totalSpots: 40,
-  },
-  {
-    id: "3",
-    name: "Estacionamiento Sur",
-    location: "Facultad de Medicina",
-    status: "heavy",
-    spotsAvailable: 3,
-    totalSpots: 50,
-  },
-  {
-    id: "4",
-    name: "Estacionamiento Deportivo",
-    location: "Gimnasio Universitario",
-    status: "low",
-    spotsAvailable: 28,
-    totalSpots: 35,
-  },
-  {
-    id: "5",
-    name: "Estacionamiento Docentes",
-    location: "Rectoría",
-    status: "moderate",
-    spotsAvailable: 8,
-    totalSpots: 25,
-  },
-  {
-    id: "6",
-    name: "Estacionamiento Visitantes",
-    location: "Entrada Principal",
-    status: "heavy",
-    spotsAvailable: 2,
-    totalSpots: 30,
-  },
-]
+    ssr: false,
+    loading: () => (
+      <div className="h-[500px] rounded-xl border bg-card flex items-center justify-center">
+        <p className="text-sm text-muted-foreground">
+          Cargando mapa...
+        </p>
+      </div>
+    ),
+  }
+)
 
 export function ParkingView() {
-  const availableCount = parkingLots.reduce((acc, lot) => acc + lot.spotsAvailable, 0)
-  const totalCount = parkingLots.reduce((acc, lot) => acc + lot.totalSpots, 0)
+  const [selectedZone, setSelectedZone] = useState<string | null>(null)
+  const availableCount = parkingZones.reduce((acc, lot) => acc + lot.availableSpots, 0)
+  const totalCount = parkingZones.reduce((acc, lot) => acc + lot.totalSpots, 0)
 
   return (
     <div className="space-y-4">
@@ -72,39 +34,61 @@ export function ParkingView() {
       <div className="bg-card rounded-xl p-4 border border-border/50">
         <div className="flex items-center justify-between">
           <div>
+            <h2 className="text-lg font-semibold">Campus San Joaquín</h2>
             <p className="text-sm text-muted-foreground">Espacios disponibles</p>
             <p className="text-2xl font-bold text-foreground">
               {availableCount} <span className="text-sm font-normal text-muted-foreground">/ {totalCount}</span>
             </p>
           </div>
           <div className="flex items-center gap-4 text-xs">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-status-low" />
-              <span className="text-muted-foreground">Disponible</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-status-moderate" />
-              <span className="text-muted-foreground">Moderado</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-status-heavy" />
-              <span className="text-muted-foreground">Lleno</span>
-            </div>
+            {Object.entries(parkingStatusMeta).map(
+              ([key, meta]) => (
+                <div
+                  key={key}
+                  className="flex items-center gap-1.5"
+                >
+                  <span
+                    className={`w-2 h-2 rounded-full ${meta.bgClass}`}
+                  />
+                  <span className="text-muted-foreground">
+                    {meta.label}
+                  </span>
+                </div>
+              )
+            )}
           </div>
         </div>
       </div>
 
+      <ParkingLotMap 
+        selectedZone={selectedZone}
+        onSelectZone={setSelectedZone}
+      />
+
       {/* Parking list */}
       <div className="space-y-3">
-        {parkingLots.map((lot) => (
-          <ParkingCard
+        {parkingZones.map((lot) => (
+          <div
             key={lot.id}
-            name={lot.name}
-            location={lot.location}
-            status={lot.status}
-            spotsAvailable={lot.spotsAvailable}
-            totalSpots={lot.totalSpots}
-          />
+            onClick={() => setSelectedZone(lot.id)}
+            className={`cursor-pointer transition ${
+              selectedZone === lot.id
+                ? "ring-2 ring-primary"
+                : ""
+            }`}
+          >
+            <ParkingCard
+              name={lot.name}
+              facultad={lot.facultad}
+              location={lot.location}
+              status={getAvailabilityStatus(
+                lot.availableSpots,
+                lot.totalSpots
+              )}
+              spotsAvailable={lot.availableSpots}
+              totalSpots={lot.totalSpots}
+            />
+          </div>
         ))}
       </div>
     </div>
